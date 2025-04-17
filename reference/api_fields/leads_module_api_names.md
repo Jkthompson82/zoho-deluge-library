@@ -83,3 +83,4 @@
 | Website                             | Website                            | URL                    |
 | Zip Code                            | Zip_Code                           | Single Line            |
 | Can Call?                           | Can_Call                           | Pick List              |
+|60 Day Consent End Date              | Day_Consent_End_Date               | Date                   |
