@@ -1,1 +1,34 @@
 
+# Deluge Syntax Notes & Working Patterns
+
+This file is for storing clean, tested Deluge code blocks that are known to work in your CRM setup. It is meant to be a reference file for ChatGPT and future development.
+
+## Structure
+Each block should be grouped by function. Example groups might include:
+- Create a task
+- Update a lead or deal
+- Schedule a call
+- Assign an owner
+- Search CRM records
+- Date math
+- Multi-step logic flows
+
+## Rules for Adding Code
+- Only paste code here **after it’s verified to work correctly**
+- Add inline comments to explain what each line does
+- Include any notes or “gotchas” (e.g., required fields, format issues)
+- Never include example code that uses assumed API names
+- Do not include generated code unless it has been tested
+
+## Example Entry Format
+> ✅ Title: What the code does  
+> 💬 One-sentence description (optional)  
+> 🧩 Code (pasted in fenced code block with `deluge` as the language)  
+> 📝 Any follow-up notes, field name warnings, or reminders
+
+---
+
+## Notes
+This file is read by ChatGPT before generating or editing code. Think of it as your master reference to prevent mistakes and speed up development.
+
+If a script requires a new pattern or function, document it here once it’s confirmed working.
