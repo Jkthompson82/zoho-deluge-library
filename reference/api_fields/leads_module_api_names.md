@@ -1,3 +1,5 @@
+///V1.1 04/17/2025 1:30 PM///
+
 | Field Label                          | API Name                           | Data Type              |
 |-------------------------------------|------------------------------------|------------------------|
 | 60 Day Consent Start Date           | DNC_Date_Last_Checked              | Date                   |
@@ -80,3 +82,4 @@
 | Visitor Score                       | Visitor_Score                      | Long Integer           |
 | Website                             | Website                            | URL                    |
 | Zip Code                            | Zip_Code                           | Single Line            |
+| Can Call?                           | Can_Call                           | Pick List              |
