@@ -51,3 +51,11 @@ All Deluge functions used in Zoho CRM **must define and map the record `id`** ex
   ```deluge
   // Arguments
   id = input.id.toLong();
+-------
+
+  Issue | Fix | Notes
+❌ Used zoho.currenttime for DateTime field | ✅ Replaced with Call_Start_Time from call record | Zoho CRM requires full DateTime, not just time
+❌ Tried to access Who_Id directly | ✅ Switched to What_Id.get("id") | Your calls are linked via What_Id
+❌ Used invalid list/map syntax (list:List(), map:Map()) | ✅ Replaced with list() and map() | Deluge only supports standard initializers
+❌ Used .get("id") without null check | ✅ Wrapped with ifnull(..., null) and validated existence before accessing | Prevented runtime error: 'get' function cannot be applied
+🛠️ Optional fix: Ensured step advancement is dynamic | ✅ Pipeline and day gaps are now easily editable | Can handle skipped steps or final-stage exits
