@@ -26,6 +26,12 @@ if (campaignId != null && campaignId.contains("Direct_Mail_Responder_Deliver_Gui
     updateMap.put("Lead_Source", "Physician Mutual Direct Mail");
     updateMap.put("SOA_Complete", "Not Required");
 }
+// === Dental Lead Logic ===
+if (campaignId != null && campaignId.toLowerCase().contains("dental"))
+{
+    updateMap.put("Lead_Type", "Dental");
+    updateMap.put("Lead_Source", "Physician Mutual Direct Mail");
+}
 
 // === DNC Checkbox ===
 if (leadData.get("Do_Not_Call_Flag") == "DoNotCall")
