@@ -32,3 +32,22 @@ Each block should be grouped by function. Example groups might include:
 This file is read by ChatGPT before generating or editing code. Think of it as your master reference to prevent mistakes and speed up development.
 
 If a script requires a new pattern or function, document it here once it’s confirmed working.
+
+
+## ✅ Deluge Argument Standards  
+**Version 1.0 — 04/17/2025**
+
+All Deluge functions used in Zoho CRM **must define and map the record `id`** explicitly. This ensures:
+
+- Better stability when executing functions from workflow rules or buttons  
+- More accurate argument handling across modules  
+- Cleaner debugging when referencing lead or contact records
+
+---
+
+### 🔧 Implementation Rules
+
+- Every function should begin with:
+  ```deluge
+  // Arguments
+  id = input.id.toLong();
