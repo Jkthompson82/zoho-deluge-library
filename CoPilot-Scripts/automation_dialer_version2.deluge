@@ -1,0 +1,98 @@
+void automation.dialer_version(string leadId, string pipelineValue, string stepValue, string callNotes, string fullName, string callResult, bool advancePipelineStage)
+{
+    info "=== Function started ===";
+    info "Parameters:";
+    info "leadId: " + leadId;
+    info "pipelineValue: " + pipelineValue;
+    info "stepValue: " + stepValue;
+    info "callNotes: " + callNotes;
+    info "fullName: " + fullName;
+    info "callResult: " + callResult;
+    info "advancePipelineStage: " + advancePipelineStage.toString();
+
+    // --- Create the Call record ---
+    callData = map();
+    callData.put("Subject", "Outgoing call to " + fullName);
+    callData.put("Call_Type", "Outbound");
+    callData.put("Call_Start_Time", zoho.currenttime.toString("yyyy-MM-dd'T'HH:mm:ss"));
+    callData.put("Description", callNotes);
+    callData.put("What_Id", {"id": leadId});
+    callData.put("$se_module", "Leads");
+    callData.put("Call_Result", callResult);
+    // Only add pipeline and step fields if advancing
+    if (advancePipelineStage) {
+        callData.put("Pipeline", pipelineValue);
+        callData.put("Diriect_Mail_Pipeline_Step_Competed", stepValue);
+    }
+    info "Call data to create: " + callData.toString();
+    createResp = zoho.crm.createRecord("Calls", callData);
+    info "Create Call response: " + createResp.toString();
+
+    // --- Prepare update map for Lead ---
+    updateMap = map();
+    updateMap.put("Last_Call_Date_Time", zoho.currenttime.toString("yyyy-MM-dd'T'HH:mm:ss"));
+    if (advancePipelineStage) {
+        stages = list();
+        stages.add("Stage 1 – (Day 1) No Voicemail / No Text");
+        stages.add("Stage 2 – (Day 2) No Voicemail / No Text");
+        stages.add("Stage 3 – (Day 3) Voicemail 1 + Text 1 (Confirm Request)");
+        stages.add("Stage 4 – (Day 6) No Voicemail / No Text");
+        stages.add("Stage 5 – (Day 8) Voicemail 2 + Text 2 (Expanded Confirm Request – send to email or house)");
+        stages.add("Stage 6 – (Day 10) No Voicemail / No Text");
+        stages.add("Stage 7 – (Day 12) No Voicemail / No Text");
+        stages.add("Stage 8 – (Day 15) Voicemail 3 + Text 3 (Still have your request – send to email or house)");
+        stages.add("Stage 9 – (Day 19) No Voicemail / No Text");
+        stages.add("Stage 10 – (Day 22) No Voicemail / No Text");
+        stages.add("Stage 11 – (Day 23) Send Email (Guide + About Me PDF) + Voicemail 4 + Text 4 (Email sent early morning)");
+        stages.add("Stage 12 – (Day 30) Send Follow-Up Email 1");
+        stages.add("Stage 13 – (Day 31) Voicemail 5 + Text 5 (Checking in)");
+        stages.add("Stage 14 – (Day 37) Send Follow-Up Email 2");
+        stages.add("Stage 15 – (Day 38) Voicemail 6 + Text 6 (Re-engagement)");
+        stages.add("Stage 16 – (Day 45) Final Voicemail 7 + Final Text 7 + Send Email 2 (Close out the request)");
+        stages.add("End Stage– Contact-Set Appointment-End Campaign");
+        stages.add("End Stage - Contact-No Appointment Send Guide/Follow Up-End Campaign");
+        stages.add("End Stage - End Campaign Non-Responder");
+        currentIndex = stages.indexOf(stepValue);
+        info "Current stage index: " + currentIndex.toString();
+        nextStep = stepValue;
+        nextDate = "";
+        // Only progress if not at end stage
+        if (currentIndex != -1 && currentIndex < stages.size() - 3) {
+            nextStep = stages.get(currentIndex + 1);
+            info "Next pipeline stage: " + nextStep;
+            curDay = 0;
+            nextDay = 0;
+            if (stepValue != null) {
+                start = stepValue.indexOf("(Day ");
+                end = stepValue.indexOf(")", start);
+                if (start != -1 && end != -1) {
+                    dayText = stepValue.subString(start + 5, end);
+                    dayText = dayText.replaceAll("[^0-9]", "");
+                    if (dayText != "") { curDay = dayText.toLong(); }
+                }
+            }
+            if (nextStep != null) {
+                start = nextStep.indexOf("(Day ");
+                end = nextStep.indexOf(")", start);
+                if (start != -1 && end != -1) {
+                    dayText = nextStep.subString(start + 5, end);
+                    dayText = dayText.replaceAll("[^0-9]", "");
+                    if (dayText != "") { nextDay = dayText.toLong(); }
+                }
+            }
+            if (curDay > 0 && nextDay > 0 && nextDay > curDay) {
+                daysToAdd = nextDay - curDay;
+                today = zoho.currentdate;
+                nextDateObj = today.addDay(daysToAdd);
+                nextDate = nextDateObj.toString("yyyy-MM-dd");
+                info "Current Day: " + curDay.toString() + ", Next Day: " + nextDay.toString() + ", Days To Add: " + daysToAdd.toString() + ", Next Date: " + nextDate;
+            } else { info "Could not calculate the correct number of days between stages."; }
+        } else { info "Current stage is an end stage or not found, no advancement."; }
+        updateMap.put("Direct_Mail_Pipeline_Next_Step", nextStep);
+        if (nextDate != "") { updateMap.put("Next_Date_to_Call", nextDate); }
+    }
+    info "Update Map for Lead: " + updateMap.toString();
+    updateResp = zoho.crm.updateRecord("Leads", leadId, updateMap);
+    info "Update Lead response: " + updateResp.toString();
+    info "=== Function completed ===";
+}
